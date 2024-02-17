@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Refund;
 use App\Models\StripePayment;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -85,6 +86,7 @@ class StripePaymentController extends Controller
             ->join('users', 'users.id', '=', 'stripe_payments.userId')
             ->orderBy('stripe_payments.id', 'DESC')
             ->get();
+
         return view('refund', compact('refund'));
     }
     public function refundBack(Request $req)
@@ -96,18 +98,39 @@ class StripePaymentController extends Controller
 
         $refundData = Stripe\Refund::create([
             'charge' => $chargeId,
-            'amount' => 100 * 10, // Refund amount in cents
+            'amount' => 100 * $data->payment, // Refund amount in cents
         ]);
-        echo $refundedAmount = $data->payment - 10;
+        echo $refundedAmount = $data->payment - ($refundData->amount_refunded / 100);
         if ($refundData->status == "succeeded") {
-            $data->payment = $refundedAmount;
-            $data->save();
+            $refund = new Refund();
+            $refund->user_id = $data->userId;
+            $refund->refund_amount = $refundedAmount;
+            $refund->charge_id = $chargeId;
+            $refund->refund_id =  $refundData->id;
+            $refund->save();
             echo "refunded";
         }
         echo "<pre>";
         print_r($refundData);
         print_r($charge);
         echo "</pre>";
+        // return back();        
+    }
+    public function refund_view()
+    {
+        $r = Refund::all();
+        return view('refund_cancel', compact('r'));
+    }
+    public function refund_cancel(Request $req)
+    {
+        Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+        $refundSuccess = $stripe->refunds->cancel($req->refund_id);
+        if ($refundSuccess->status == 'succeeded') {
+            echo "Refund Canceled\n<pre>";
+            print_r($refundSuccess);
+            echo "</pre>";
+        }
     }
 }
 

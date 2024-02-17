@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <h1>Total Payment</h1>
+    <h1>Refund Data</h1>
     <table class="table">
         <thead>
             <tr>
@@ -22,15 +22,13 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($refund as $key => $item)
+            @foreach ($r as $item)
                 <tr>
                     <th scope="row">{{ $item->id }}</th>
-                    <td>{{ $item->name }}</td>
-                    <td>${{ $item->payment }}</td>
-                    <td>{{ $item->charge }}</td>
-                    <td><a href="{{ url('refundBack') . '?id=' . $item->id }}">refund</a>
-                        ||
-                    </td>
+                    <td>{{ $item->refund_id }}</td>
+                    <td>${{ $item->charge_id }}</td>
+                    <td>{{ $item->refund_ammount }}</td>
+                    <td><a href="{{ url('refund_cancel') . '?refund_id=' . $item->refund_id }}">refund Cancel</a></td>
                 </tr>
             @endforeach
         </tbody>

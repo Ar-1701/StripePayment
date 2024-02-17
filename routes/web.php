@@ -16,6 +16,8 @@ use App\Http\Controllers\StripePaymentController;
 
 Route::get('/', [StripePaymentController::class, 'product']);
 Route::get('/refund', [StripePaymentController::class, 'refund']);
-Route::get('refundBack', [StripePaymentController::class, '']);
+Route::get('/refund_cancel', [StripePaymentController::class, 'refund_cancel']);
+Route::get('/refund_view', [StripePaymentController::class, 'refund_view']);
+Route::get('refundBack', [StripePaymentController::class, 'refundBack']);
 Route::get('stripe', [StripePaymentController::class, 'stripe']);
 Route::post('stripe', [StripePaymentController::class, 'stripePost'])->name('stripe.post');
