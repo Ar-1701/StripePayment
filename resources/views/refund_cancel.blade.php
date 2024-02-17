@@ -15,9 +15,10 @@
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">name</th>
-                <th scope="col">Payment</th>
-                <th scope="col">Charge</th>
+                <th scope="col">refund_id</th>
+                <th scope="col">Charge_id</th>
+                <th scope="col">Amount</th>
+                
                 <th scope="col">Handle</th>
             </tr>
         </thead>
@@ -27,7 +28,7 @@
                     <th scope="row">{{ $item->id }}</th>
                     <td>{{ $item->refund_id }}</td>
                     <td>${{ $item->charge_id }}</td>
-                    <td>{{ $item->refund_ammount }}</td>
+                    <td>{{ $item->refund_amount }}</td>
                     <td><a href="{{ url('refund_cancel') . '?refund_id=' . $item->refund_id }}">refund Cancel</a></td>
                 </tr>
             @endforeach
