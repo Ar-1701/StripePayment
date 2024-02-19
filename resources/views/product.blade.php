@@ -8,7 +8,9 @@
     <title>Document</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
+
 <body>
+    <a href="{{ url('cart_view') }}">Add to cart</a>
     <h1>Total Product</h1>
     <table class="table">
         <thead>
@@ -25,7 +27,7 @@
                     <th scope="row">{{ $item->id }}</th>
                     <td>{{ $item->title }}</td>
                     <td>${{ $item->price }}</td>
-                    <td><a href="{{ url('stripe') . '?id=' . $item->id }}">Payment</a></td>
+                    <td><a href="{{ url('save-add-tocart') . '?id=' . $item->id }}">add to cart</a></td>
                 </tr>
             @endforeach
         </tbody>

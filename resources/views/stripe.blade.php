@@ -11,7 +11,30 @@
         <div class="row justify-content-center">
             <h3 style="text-align: center;margin-top: 40px;margin-bottom: 40px;">How To Integrate Stripe Payment Gateway
                 In Laravel 10</h3>
+            @php
+                $priceArr = [];
+            @endphp
+
+            <table class="table table-bordered">
+                <tr>
+                    <td>Product Name</td>
+                    <td>qty</td>
+                    <td>price</td>
+                </tr>
+                @foreach ($product as $item)
+                    @php
+                        array_push($priceArr, $item->qty * $item->price);
+                    @endphp
+                    <tbody>
+                        <td> {{ $item->product_name }}</td>
+                        <td> {{ $item->qty }}</td>
+                        <td> ${{ $item->price }}</td>
+                    </tbody>
+                @endforeach
+            </table>
+
             <div class="col-md-6 col-md-offset-3 border ">
+
                 <div class="panel panel-default credit-card-box">
                     <div class="panel-heading">
                         <div class="row justify-content-center">
@@ -30,13 +53,10 @@
                             class="require-validation" data-cc-on-file="false"
                             data-stripe-publishable-key="{{ env('STRIPE_KEY') }}" id="payment-form">
                             @csrf
-
                             <div class='form-row row'>
+                                <input type="hidden" name="price"id="price" value="{{ array_sum($priceArr) }}">
+                                <input type="hidden" name="user_id"id="user_id" value="{{ $item->user_id }}">
                                 <div class='col-xs-12 col-md-6 form-group required'>
-                                    <label class='control-label'>Name on Card</label>
-                                    <input value='{{ $product->title }}' type="hidden" name='title'>
-                                    <input value='{{ $product->price }}' type="hidden" name='price'>
-                                    <input value='1' type="hidden" name='user_id'>
                                     <input class='form-control' size='4' type='text'>
                                 </div>
                                 <div class='col-xs-12 col-md-6 form-group required'>
@@ -65,7 +85,7 @@
                             <div class="form-row row">
                                 <div class="col-xs-12">
                                     <button class="btn btn-primary btn-lg btn-block" type="submit">Pay
-                                        Now - ${{ $product->price }}</button>
+                                        Now - ${{ array_sum($priceArr) }}</button>
                                 </div>
                             </div>
                         </form>

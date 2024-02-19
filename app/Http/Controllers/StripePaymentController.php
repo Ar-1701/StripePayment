@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AddToCart;
 use App\Models\Product;
 use App\Models\Refund;
 use App\Models\StripePayment;
@@ -15,7 +16,8 @@ class StripePaymentController extends Controller
 {
     public function stripe(Request $req)
     {
-        $product = Product::find($req->id);
+        $req->user_id;
+        $product = AddToCart::whereRaw('user_id=?', $req->user_id)->get();
         return view('stripe', compact('product'));
     }
     public function stripePost(Request $req)
@@ -24,6 +26,7 @@ class StripePaymentController extends Controller
         // die;
         $price = $req->price;
         $customerData = User::find($req->user_id);
+        $AddtoCart = AddtoCart::whereRaw('user_id=?', $customerData->id)->get();
         $sizeOptions = ['Small', 'Medium', 'Large'];
         $colorOptions = ['Red', 'Blue', 'Green'];
         Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -49,17 +52,18 @@ class StripePaymentController extends Controller
             'currency' => 'usd',
             'description' => 'Your Invoice Description',
         ]);
-        $product = Stripe\Product::create([
-            'name' => $req->title,
-            'type' => 'service',
-
-            'description' => 'Premium subscription plan',
-            'attributes' => ['M', 'blue'],
-            'metadata' => [
-                'size_options' => json_encode($sizeOptions),
-                'color_options' => json_encode($colorOptions),
-            ],
-        ]);
+        foreach ($AddtoCart as $item) {
+            $product = Stripe\Product::create([
+                'name' => $item->product_name,
+                'type' => 'service',
+                'description' => 'Premium subscription plan',
+                'attributes' => ['qty', 'price'],
+                'metadata' => [
+                    'qty' => json_encode($item->qty),
+                    'price' => json_encode($item->price),
+                ],
+            ]);
+        }
         if ($ch->status == "succeeded") {
             $productData = new StripePayment();
             $productData->userId = 1;
@@ -131,6 +135,31 @@ class StripePaymentController extends Controller
             print_r($refundSuccess);
             echo "</pre>";
         }
+    }
+    public function cart_view()
+    {
+        $product =  AddToCart::get();
+        return view('add-to-cart', compact('product'));
+    }
+    public function update_qty(Request $req)
+    {
+        $add = AddToCart::find($req->id);
+        $add->product_id = $req->id;
+        $add->qty = $req->qty;
+        $add->save();
+        return back();
+    }
+    public function dataSend(Request $req)
+    {
+        $product = Product::find($req->id);
+        $add = new AddToCart();
+        $add->user_id = 1;
+        $add->product_id = $req->id;
+        $add->price = $product->price;
+        $add->product_name =  $product->title;
+        $add->qty =  1;
+        $add->save();
+        return back();
     }
 }
 

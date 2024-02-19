@@ -18,7 +18,6 @@
                 <th scope="col">refund_id</th>
                 <th scope="col">Charge_id</th>
                 <th scope="col">Amount</th>
-                
                 <th scope="col">Handle</th>
             </tr>
         </thead>
